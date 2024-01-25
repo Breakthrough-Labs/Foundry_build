@@ -1,0 +1,223 @@
+[workspace]
+members = [
+    "crates/anvil/",
+    "crates/anvil/core/",
+    "crates/anvil/rpc/",
+    "crates/anvil/server/",
+    "crates/cast/",
+    "crates/cheatcodes/",
+    "crates/cheatcodes/spec/",
+    "crates/chisel/",
+    "crates/cli/",
+    "crates/common/",
+    "crates/config/",
+    "crates/debugger/",
+    "crates/doc/",
+    "crates/evm/core/",
+    "crates/evm/coverage/",
+    "crates/evm/evm/",
+    "crates/evm/fuzz/",
+    "crates/evm/traces/",
+    "crates/fmt/",
+    "crates/forge/",
+    "crates/macros/",
+    "crates/test-utils/",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.74" # Remember to update clippy.toml as well
+authors = ["Foundry Contributors"]
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/foundry-rs/foundry"
+repository = "https://github.com/foundry-rs/foundry"
+exclude = ["benches/", "tests/", "test-data/", "testdata/"]
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch,
+# and we don't rely on it for debugging that much
+debug = 0
+
+# Speed up tests and dev build
+[profile.dev.package]
+# solc
+foundry-compilers.opt-level = 3
+solang-parser.opt-level = 3
+serde_json.opt-level = 3
+
+# evm
+alloy-primitives.opt-level = 3
+alloy-sol-types.opt-level = 3
+hashbrown.opt-level = 3
+keccak.opt-level = 3
+revm-interpreter.opt-level = 3
+revm-precompile.opt-level = 3
+revm-primitives.opt-level = 3
+revm.opt-level = 3
+ruint.opt-level = 3
+sha2.opt-level = 3
+sha3.opt-level = 3
+tiny-keccak.opt-level = 3
+
+# keystores
+scrypt.opt-level = 3
+
+# forking
+axum.opt-level = 3
+
+# Local "release" mode, more optimized than dev but much faster to compile than release
+[profile.local]
+inherits = "dev"
+opt-level = 1
+strip = true
+panic = "abort"
+codegen-units = 16
+
+# Like release, but with full debug symbols and with stack unwinds. Useful for e.g. `perf`.
+[profile.debug-fast]
+inherits = "release"
+debug = true
+strip = "none"
+panic = "unwind"
+incremental = false
+
+# Optimized release profile
+[profile.release]
+opt-level = 3
+lto = "fat"
+strip = true
+panic = "abort"
+codegen-units = 1
+
+# Override packages which aren't perf-sensitive for faster compilation speed
+[profile.release.package]
+mdbook.opt-level = 1
+protobuf.opt-level = 1
+rusoto_core.opt-level = 1
+rusoto_credential.opt-level = 1
+rusoto_kms.opt-level = 1
+toml_edit.opt-level = 1
+trezor-client.opt-level = 1
+
+[workspace.dependencies]
+anvil = { path = "crates/anvil" }
+cast = { path = "crates/cast" }
+chisel = { path = "crates/chisel" }
+forge = { path = "crates/forge" }
+
+forge-doc = { path = "crates/doc" }
+forge-fmt = { path = "crates/fmt" }
+foundry-cheatcodes = { path = "crates/cheatcodes" }
+foundry-cheatcodes-spec = { path = "crates/cheatcodes/spec" }
+foundry-cli = { path = "crates/cli" }
+foundry-common = { path = "crates/common" }
+foundry-config = { path = "crates/config" }
+foundry-debugger = { path = "crates/debugger" }
+foundry-evm = { path = "crates/evm/evm" }
+foundry-evm-core = { path = "crates/evm/core" }
+foundry-evm-coverage = { path = "crates/evm/coverage" }
+foundry-evm-fuzz = { path = "crates/evm/fuzz" }
+foundry-evm-traces = { path = "crates/evm/traces" }
+foundry-macros = { path = "crates/macros" }
+foundry-test-utils = { path = "crates/test-utils" }
+
+# solc & compilation utilities
+foundry-block-explorers = { version = "0.2.0", default-features = false }
+foundry-compilers = { version = "0.2.2", default-features = false }
+
+## revm
+# no default features to avoid c-kzg
+revm = { version = "3", default-features = false }
+revm-primitives = { version = "1", default-features = false }
+revm-inspectors = { version = "0.1", default-features = false }
+
+## ethers
+ethers = { version = "2.0", default-features = false }
+ethers-core = { version = "2.0", default-features = false }
+ethers-contract = { version = "2.0", default-features = false }
+ethers-contract-abigen = { version = "2.0", default-features = false }
+ethers-providers = { version = "2.0", default-features = false }
+ethers-signers = { version = "2.0", default-features = false }
+ethers-middleware = { version = "2.0", default-features = false }
+ethers-solc = { version = "2.0", default-features = false }
+
+## alloy
+alloy-consensus = { git = "https://github.com/alloy-rs/alloy" }
+alloy-eips = { git = "https://github.com/alloy-rs/alloy" }
+alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy" }
+alloy-network = { git = "https://github.com/alloy-rs/alloy" }
+alloy-node-bindings = { git = "https://github.com/alloy-rs/alloy" }
+alloy-providers = { git = "https://github.com/alloy-rs/alloy" }
+alloy-pubsub = { git = "https://github.com/alloy-rs/alloy" }
+alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy" }
+alloy-rpc-trace-types = { git = "https://github.com/alloy-rs/alloy" }
+alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy" }
+alloy-signer = { git = "https://github.com/alloy-rs/alloy" }
+alloy-transport = { git = "https://github.com/alloy-rs/alloy" }
+alloy-transport-http = { git = "https://github.com/alloy-rs/alloy" }
+alloy-transport-ipc = { git = "https://github.com/alloy-rs/alloy" }
+alloy-transport-ws = { git = "https://github.com/alloy-rs/alloy" }
+alloy-primitives = "0.6.0"
+alloy-dyn-abi = "0.6.0"
+alloy-json-abi = "0.6.0"
+alloy-sol-types = "0.6.0"
+syn-solidity = "0.6.0"
+
+alloy-chains = "0.1.5"
+alloy-rlp = "0.3.3"
+solang-parser = "=0.3.3"
+
+## misc
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+color-eyre = "0.6"
+derive_more = "0.99"
+eyre = "0.6"
+hex = { package = "const-hex", version = "1.6", features = ["hex"] }
+itertools = "0.11"
+jsonpath_lib = "0.3"
+pretty_assertions = "1.4"
+protobuf = "=3.2.0"
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision"] }
+base64 = "0.21"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+evm-disassembler = "0.4"
+
+axum = "0.6"
+hyper = "0.14"
+tower = "0.4"
+tower-http = "0.4"
+
+#[patch."https://github.com/gakonst/ethers-rs"]
+#ethers = { path = "../ethers-rs/ethers" }
+#ethers-addressbook = { path = "../ethers-rs/ethers-addressbook" }
+#ethers-contract = { path = "../ethers-rs/ethers-contract" }
+#ethers-contract-abigen = { path = "../ethers-rs/ethers-contract/ethers-contract-abigen" }
+#ethers-core = { path = "../ethers-rs/ethers-core" }
+#ethers-etherscan = { path = "../ethers-rs/ethers-etherscan" }
+#ethers-middleware = { path = "../ethers-rs/ethers-middleware" }
+#ethers-providers = { path = "../ethers-rs/ethers-providers" }
+#ethers-signers = { path = "../ethers-rs/ethers-signers" }
+#ethers-solc = { path = "../ethers-rs/ethers-solc" }
+
+[patch.crates-io]
+ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-core = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-contract = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-contract-abigen = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-providers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-signers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-middleware = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+ethers-solc = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
+
+revm = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
+revm-primitives = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
+revm-interpreter = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
+revm-precompile = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
+
+revm-inspectors = { git = "https://github.com/paradigmxyz/evm-inspectors" }
